@@ -43,6 +43,6 @@ app.get('/images', (req, res) => {
 
     res.status(200).send({images: images});
   }  
-})
+}) 
 
 app.listen(process.env.PORT || 3000)
