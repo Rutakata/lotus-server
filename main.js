@@ -72,4 +72,14 @@ app.get('/projects/create', (req, res) => {
   }
 })
 
+app.get('/projects', (req, res) => {
+  const projects = fs
+    .readdirSync(process.env.PROJECTS_DIR)
+    .filter(function (file) {
+      return fs.statSync(process.env.PROJECTS_DIR+'/'+file).isDirectory();
+    });
+
+  res.status(200).send({projects});
+})
+
 app.listen(process.env.PORT || 3000)
