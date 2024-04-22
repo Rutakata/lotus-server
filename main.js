@@ -21,34 +21,6 @@ app.use(function(req, res, next) {
   next();
 });
 
-app.get('/assets', (req, res) => {
-  const projectFolder = req.query.project;
-
-  if (projectFolder === undefined) {
-    res.status(400).send({
-      message: 'Project name URL parameter is missing'
-    });
-  }else if (projectFolder === '') {
-    res.status(400).send({
-      message: 'URL parameter project is empty'
-    });
-  }else {
-    const projectDir = process.env.PROJECTS_DIR + projectFolder + '/assets';
-    const assets = [];
-
-    fs.readdirSync(projectDir)
-      .forEach(file => {
-        const fileType = file.split('.')[1];
-
-        if (fileType === 'jpg' || fileType === 'png' || fileType === 'jpeg') {
-          assets.push(`../../public/${projectFolder}/assets/${file}`);
-        }
-      });
-
-    res.status(200).send({assets});
-  }  
-})
-
 app.get('/projects', (req, res) => {
   const projects = fs
     .readdirSync(process.env.PROJECTS_DIR)
@@ -131,7 +103,6 @@ app.get('/project/scenes', (req, res) => {
     });
   }else {
     const projectDir = process.env.PROJECTS_DIR + projectName + '/scenes';
-
     const scenes = [];
 
     fs.readdirSync(projectDir)
@@ -139,12 +110,69 @@ app.get('/project/scenes', (req, res) => {
         const fileType = file.split('.')[1];
 
         if (fileType === 'json') {
-          scenes.push(file);
+          const data = fs.readFileSync(projectDir + "/" + file);
+          scenes.push(JSON.parse(data));
         }
       });
 
-    res.status(200).send({scenes});
+    res.status(200).send(scenes);
   }
+})
+
+app.get('/project/assets', (req, res) => {
+  const projectFolder = req.query.project;
+
+  if (projectFolder === undefined) {
+    res.status(400).send({
+      message: 'Project name URL parameter is missing'
+    });
+  }else if (projectFolder === '') {
+    res.status(400).send({
+      message: 'URL parameter project is empty'
+    });
+  }else {
+    const projectDir = process.env.PROJECTS_DIR + projectFolder + '/assets';
+    const assets = [];
+
+    fs.readdirSync(projectDir)
+      .forEach(file => {
+        const fileType = file.split('.')[1];
+
+        if (fileType === 'jpg' || fileType === 'png' || fileType === 'jpeg') {
+          assets.push(file);
+        }
+      });
+
+    res.status(200).send(assets);
+  }  
+})
+
+app.get('/project/music', (req, res) => {
+  const projectFolder = req.query.project;
+
+  if (projectFolder === undefined) {
+    res.status(400).send({
+      message: 'Project name URL parameter is missing'
+    });
+  }else if (projectFolder === '') {
+    res.status(400).send({
+      message: 'URL parameter project is empty'
+    });
+  }else {
+    const projectDir = process.env.PROJECTS_DIR + projectFolder + '/audio';
+    const music = [];
+
+    fs.readdirSync(projectDir)
+      .forEach(file => {
+        const fileType = file.split('.')[1];
+
+        if (fileType === 'mp3' || fileType === 'wav') {
+          music.push(file);
+        }
+      });
+
+    res.status(200).send(music);
+  }  
 })
 
 app.get('/project/text', (req, res) => {
@@ -200,11 +228,12 @@ app.get('/project/audio', (req, res) => {
         const fileType = file.split('.')[1];
 
         if (fileType === 'json') {
-          audio.push(file);
+          const data = fs.readFileSync(projectDir + "/" + file);
+          audio.push(JSON.parse(data));
         }
       });
 
-    res.status(200).send({audio});
+    res.status(200).send(audio);
   }
 })
 
